@@ -36,6 +36,9 @@ namespace MyBird
         public GameObject readyUI;
         public GameObject gameOverUI;
 
+        //사운드
+        private AudioSource audioSource;                //포인트  사운드
+
         #endregion
 
         #region Unity Event Method
@@ -43,6 +46,7 @@ namespace MyBird
         {
             //참조
             rb2D = this.GetComponent<Rigidbody2D>();
+            audioSource = this.GetComponent<AudioSource>();
         }
 
         private void Update()
@@ -86,14 +90,11 @@ namespace MyBird
         //충돌 체크 - 매개변수로 부딪힌 충돌체를 입력 받는다
         private void OnCollisionEnter2D(Collision2D collision)
         {
+            
             // 충돌한 충돌체 체크
-            if (collision.gameObject.tag == "Pipe")
+           if (collision.gameObject.tag == "Ground")
             {
-                GameOver();
-            }
-            // 충돌한 충돌체 체크
-            else if (collision.gameObject.tag == "Ground")
-            {
+                //그라운드와 충돌
                 GameOver();
             }
         }
@@ -105,13 +106,36 @@ namespace MyBird
             // 충돌한 충돌체 체크
             if (collision.gameObject.tag == "Point")
             {
-                GameManager.Score++;
-                //Debug.Log($"점수 : {GameManager.Score}");
+                GetPoint();               
+            }
+            else if (collision.gameObject.tag == "Pipe")
+            {
+                //기둥과 충돌
+                GameOver();
             }
         }
         #endregion
 
         #region Custom Method
+
+        //점수 획득 처리
+        void GetPoint()
+        {
+            GameManager.Score++;
+           
+            //사운드(효과) : vfx, sfx
+            audioSource.Play();
+
+            //게임 포인트 체크
+            if(GameManager.Score%10 == 0)
+            {
+                //레벨링
+                GameManager.spawnValue += 0.05f;
+            }
+
+        }
+
+
 
         //게임 오버 처리
         void GameOver()
@@ -125,11 +149,24 @@ namespace MyBird
         {
             if (GameManager.IsDeath)
                 return;
-
+#if UNITY_EDITOR    //유니티 에디터 마우스와 키보드 입력 처리
             //스페이스 키 OR 마우스 왼클릭으로 입력받기
             keyJump |= Input.GetKeyDown(KeyCode.Space);
             keyJump |= Input.GetMouseButtonDown(0);
+#else      //그 외 플랫폼에서 터치 입력 처리
 
+            if(Input.touchCount > 0);
+            {
+                //첫번째 들어온 터치 가져오기
+                Touch touch = Input.GetTouch(0);
+
+                if(touch.phase == TouchPhase.Began)
+                {
+                    keyJump |= true;
+                }
+            }
+
+#endif
 
             //플레이어 이동 시작
             if (GameManager.IsStart == false && keyJump == true)
@@ -192,6 +229,6 @@ namespace MyBird
             transform.Translate(Vector3.right * Time.deltaTime * moveSpeed, Space.World);
         }
 
-        #endregion
+#endregion
     }
 }

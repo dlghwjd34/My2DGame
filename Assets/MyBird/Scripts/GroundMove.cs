@@ -28,7 +28,7 @@ namespace MyBird
         {
             this.transform.Translate(Vector3.left * Time.deltaTime * moveSpeed, Space.World);
 
-            if(transform.localPosition.x <= -8.4f)
+            if(transform.localPosition.x <= -8f)
             {
                 this.transform.localPosition = new Vector3(transform.localPosition.x + 8.4f,
                     transform.localPosition.y, transform.localPosition.z);

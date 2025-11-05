@@ -36,6 +36,7 @@ namespace MyBird
                 SpawnPipe();
                 //타이머 초기화
                 countdown = 0f;
+                spawnTimer = 1f;
             }
         }
 
