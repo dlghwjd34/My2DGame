@@ -31,15 +31,15 @@ namespace My2DGame
         private void FixedUpdate()
         {
             //이동()
-            
+
             // * Time.deltaTime 을 생략
             //Why - * Time.deltaTime 삽입이유 : 어떤 디바이스에서든 똑같은 속도를 보장하기 위함
             // 이 경우 굳이...
 
             //rb2D.linearVelocity = new Vector2(inputMove.x * walkSpeed, inputMove.y * walkSpeed);
             //rb2D.linearVelocity = new Vector2(inputMove.x * walkSpeed, 0f);
-            rb2D.linearVelocity = new Vector2(inputMove.x * walkSpeed, rb2D.linearVelocity.y);
-
+            //rb2D.linearVelocity = new Vector2(inputMove.x * walkSpeed, rb2D.linearVelocity.y);
+            rb2D.linearVelocity = new Vector2(inputMove.x * walkSpeed,  inputMove.y * walkSpeed);
 
         }
 
