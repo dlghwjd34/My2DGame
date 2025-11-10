@@ -10,8 +10,7 @@ namespace My2DGame
         public Transform followTarget;  //플레이어
 
         private Vector2 startPosition;  //배경 오브젝트의 최초 위치
-        [SerializeField]
-        private float startZ = 5f;           //배경의 깊이
+        private float startZ;           //배경의 깊이
         #endregion
 
         #region Property
