@@ -12,13 +12,15 @@ namespace My2DGame
         //참조
         private Rigidbody2D rb2D;
         private Animator animator;
+        private TouchingDirections touchingDirections;
+        private Damageable damageable;
 
         //이동
         [SerializeField] private float walkSpeed = 3f;
-
         //달리는 속도
-        [SerializeField]
-        public float runSpeed = 6f;
+        [SerializeField] public float runSpeed = 6f;
+        //공중 속도
+        [SerializeField] private float airSpeed = 2f; 
 
         //반전
         private bool isFacingRight = true;
@@ -38,7 +40,7 @@ namespace My2DGame
 
         #region Property
 
-        public bool IsFace
+        public bool IsFacingRight
         {
             get { return isFacingRight; }
             private set
@@ -79,35 +81,35 @@ namespace My2DGame
         {
             get
             {
-                if(CannotMove)  //애니메이터 파라미터 값 읽어오기
+                if (CannotMove)  //애니메니터 파라미터 값 읽어오기
                 {
                     return 0f;
                 }
 
-
-
-                if(IsMove &&TouchingDirections.IsWall == false) //이동가능
+                if (IsMove && touchingDirections.IsWall == false) //이동 가능
                 {
-                    if9
-
-
-                    if(IsRun)
+                    if (touchingDirections.IsGround) //땅에 있을때
                     {
-                        return runSpeed;
+                        if (IsRun)
+                        {
+                            return runSpeed;
+                        }
+                        else
+                        {
+                            return walkSpeed;
+                        }
                     }
-                    else //이동불가
+                    else //공중에 있을때
                     {
-                        return walkSpeed;
+                        return airSpeed;
                     }
                 }
-                
-                else //이동불가
+                else //이동 불가
                 {
                     return 0f;
                 }
-                               
-            }        
-            
+
+            }
         }
 
         //애니메이터의 파라미터값 가져오기
@@ -119,6 +121,15 @@ namespace My2DGame
             }
         }
 
+        //애니메이터의 파라미터 값 읽어오기
+        public bool LockVelocity
+        {
+            get
+            {
+                return animator.GetBool(AnimationString.LockVelocity);
+            }
+        }
+
         #endregion
 
         #region Unity Event Method
@@ -127,6 +138,12 @@ namespace My2DGame
             //참조 -- 이 프로젝트 대부분의 참조는 Awake 로
             rb2D = this.GetComponent<Rigidbody2D>();
             animator = this.GetComponent<Animator>();
+            touchingDirections = this.GetComponent<TouchingDirections>();
+            damageable = this.GetComponent<Damageable>();
+
+            //이벤트 함수 등록
+            damageable.hitAction += OnHit;
+
         }
 
         private void FixedUpdate()
@@ -137,9 +154,10 @@ namespace My2DGame
             // 이 경우 굳이...
             rb2D.linearVelocity = new Vector2(inputMove.x * CurrentMoveSpeed, rb2D.linearVelocity.y);
 
-            //점프 애니메이션
             /*amulator.SetFlaot(AnimationString,Yveolco
               fof )*/
+            //점프 애니메이션
+            animator.SetFloat(AnimationString.YVelocity, rb2D.linearVelocityY);
 
         }
 
@@ -161,6 +179,7 @@ namespace My2DGame
             }
         }
 
+        //이동입력처리
         public void OnMove(InputAction.CallbackContext context)
         {
             inputMove = context.ReadValue<Vector2>();
@@ -188,22 +207,27 @@ namespace My2DGame
         {
             if(context.started)
             {
-                Debug.Log("플레이어가 점프했습니다");
+                //Debug.Log("플레이어가 점프했습니다");
                 animator.SetTrigger(AnimationString.JumpTrigger);
                 rb2D.linearVelocity = new Vector2(rb2D.linearVelocity.x, jumpForce);
             }
         }
 
-        /*
         //공격 입력 처리
         public void OnAttack(InputAction.CallbackContext context)
         {
-            if(context.started && TouchingDirections.IsGround)
+            if (context.started && touchingDirections.IsGround)
             {
                 animator.SetTrigger(AnimationString.AttackTrigger);
             }
         }
-        */
+
+        //데미지 이벤트에 등록되는 함수
+        public void OnHit(float damage, Vector2 knockback)
+        {
+            rb2D.linearVelocity = new Vector2(knockback.x, rb2D.linearVelocityY + knockback.y);
+        }
+
         #endregion
     }
 }

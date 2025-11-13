@@ -51,10 +51,10 @@ namespace My2DGame
 
         public bool IsCelling
         {
-            get { return IsCelling; }
+            get { return isCelling; }
             private set
             {
-                IsCelling = value;
+                isCelling = value;
                 //애니 파라미터 셋팅
 
             }
